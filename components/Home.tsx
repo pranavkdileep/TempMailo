@@ -11,7 +11,7 @@ import {
   MailCheck,
 } from "lucide-react";
 import EmailView from "./EmailView";
-import { getcurrentEmail, registerEmail } from "@/actions/actions";
+import { deletecurrentEmail, getcurrentEmail, registerEmail } from "@/actions/actions";
 
 interface Email {
   id: string;
@@ -114,7 +114,8 @@ function HomePage() {
     navigator.clipboard.writeText(currentEmail);
   };
 
-  const deleteEmail = () => {
+  const deleteEmail = async () => {
+    await deletecurrentEmail();
     setCurrentEmail("");
   };
 

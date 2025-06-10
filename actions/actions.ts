@@ -70,7 +70,39 @@ export const registerEmail = async (name: string = Math.random().toString(36).su
     }
 }
 
-export const deleteEmail = 
+export const deletecurrentEmail = async () => {
+    try{
+        const currentemail = (await cookies()).get("currentemail");
+        const currenttoken = (await cookies()).get("currenttoken");
+        if (!currentemail || !currenttoken) {
+            throw new Error("No current email or token found");
+        }
+        const response = await fetch(`${baseUrl}/api/v3/email/${currentemail.value}`, {
+            method: 'DELETE',
+            headers: {
+              'x-rapidapi-key': x_rapidapi_key,
+              'x-rapidapi-host': x_rapidapi_host,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                token: currenttoken.value
+            })
+          }
+        );
+        if (!response.ok) {
+            throw new Error("Failed to delete email");
+        }
+        const cookieStore = await cookies();
+        cookieStore.delete("currentemail");
+        cookieStore.delete("currenttoken");
+        return true;
+    }catch (error) {
+        const cookieStore = await cookies();
+        cookieStore.delete("currentemail");
+        cookieStore.delete("currenttoken");
+        return true;
+    }
+}
 
 export const getDomains = async () => {
     try {
