@@ -122,7 +122,7 @@ function HomePage() {
               <div className="size-7 text-blue-600">
                 <Image
                   src="/logo.svg"
-                  alt="TempMail Logo"
+                  alt="TempMailo Logo - Temporary Email Service"
                   width={48}
                   height={48}
                   ></Image>
@@ -166,7 +166,7 @@ function HomePage() {
             <div className="size-7 text-blue-600">
             <Image
                   src="/logo.svg"
-                  alt="TempMail Logo"
+                  alt="TempMailo Logo - Temporary Email Service"
                   width={48}
                   height={48}
                   ></Image>

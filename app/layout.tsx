@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TempMailo",
-  description: "temporary email service"
+  title: "TempMailo - Free Temporary Email Service",
+  description: "Get a free, temporary email address with TempMailo. Protect your privacy and avoid spam with our disposable email service.",
 };
 
 export default function RootLayout({
