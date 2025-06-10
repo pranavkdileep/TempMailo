@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import {
   Copy,
+  Check,
   RefreshCw,
   Trash2,
   Github,
@@ -11,7 +12,14 @@ import {
   MailCheck,
 } from "lucide-react";
 import EmailView from "./EmailView";
-import { deletecurrentEmail, getcurrentEmail, registerEmail } from "@/actions/actions";
+import {
+  deletecurrentEmail,
+  getcurrentEmail,
+  getEmails,
+  registerEmail,
+} from "@/actions/actions";
+
+import Image from "next/image";
 
 interface Email {
   id: string;
@@ -27,91 +35,66 @@ interface Email {
 }
 
 function HomePage() {
-  const [currentEmail, setCurrentEmail] = useState(
-    "loading..."
-  );
+  const [currentEmail, setCurrentEmail] = useState("loading...");
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
-  const [emails,setEmails] = useState<Email[]>([
-    {
-      id: "1",
-      from: "support@tempmail.com",
-      to: "temp.email.demo@mailbox.com",
-      cc: "",
-      subject: "Welcome to TempMail!",
-      body_text: "Welcome to TempMail! Your temporary email service is now active. You can start receiving emails immediately.",
-      body_html: "<p>Welcome to TempMail! Your temporary email service is now active. You can start receiving emails immediately.</p>",
-      created_at: "2 hours ago",
-      isRead: false,
-      isUnread: true
-    },
-    {
-      id: "2",
-      from: "noreply@github.com",
-      to: "temp.email.demo@mailbox.com",
-      cc: "",
-      subject: "GitHub Security Alert",
-      body_text: "We noticed a new sign-in to your GitHub account from a new device.",
-      body_html: "<p>We noticed a new sign-in to your GitHub account from a new device.</p>",
-      created_at: "5 hours ago",
-      isRead: true,
-      isUnread: false
-    },
-    {
-      id: "3",
-      from: "newsletters@techcrunch.com",
-      to: "temp.email.demo@mailbox.com",
-      cc: "marketing@techcrunch.com",
-      subject: "Weekly Tech Newsletter - AI Breakthroughs",
-      body_text: "This week in tech: Major AI breakthroughs, startup funding rounds, and the latest in cybersecurity.",
-      body_html: "<h2>This week in tech:</h2><p>Major AI breakthroughs, startup funding rounds, and the latest in cybersecurity.</p>",
-      created_at: "1 day ago",
-      isRead: true,
-      isUnread: false
-    },
-    {
-      id: "4",
-      from: "notifications@linkedin.com",
-      to: "temp.email.demo@mailbox.com",
-      cc: "",
-      subject: "John Doe wants to connect with you",
-      body_text: "John Doe would like to add you to their professional network on LinkedIn.",
-      body_html: "<p>John Doe would like to add you to their professional network on LinkedIn.</p>",
-      created_at: "2 days ago",
-      isRead: false,
-      isUnread: true
-    },
-    {
-      id: "5",
-      from: "billing@aws.amazon.com",
-      to: "temp.email.demo@mailbox.com",
-      cc: "finance@aws.amazon.com",
-      subject: "Your AWS Monthly Bill is Ready",
-      body_text: "Your AWS bill for this month is $47.32. View your detailed usage and billing information.",
-      body_html: "<p>Your AWS bill for this month is <strong>$47.32</strong>. View your detailed usage and billing information.</p>",
-      created_at: "3 days ago",
-      isRead: true,
-      isUnread: false
-    }
-  ]);
+  const [emails, setEmails] = useState<Email[]>([]);
+  const [loadingGenerate, setLoadingGenerate] = useState(false);
+  const [loadingDelete, setLoadingDelete] = useState(false);
+  const [loadingEmails, setLoadingEmails] = useState(true);
+  const [isCopied, setIsCopied] = useState(false);
 
   useEffect(() => {
-    getcurrentEmail().then((email) => {
+    setLoadingGenerate(true);
+    getcurrentEmail()
+      .then((email) => {
         console.log("Current email:", email);
         setCurrentEmail(email);
-    }).catch((error) => {
-      console.error("Error fetching current email:", error);
-      setCurrentEmail("Failed to load email");
-    })
+      })
+      .catch((error) => {
+        console.error("Error fetching current email:", error);
+        setCurrentEmail("Failed to load email");
+      });
+    setLoadingGenerate(false);
   }, []);
+  useEffect(() => {
+    if(!currentEmail || currentEmail === "loading...") return;
+    getEmails(currentEmail)
+      .then((emails) => {
+        console.log("Fetched emails:", emails);
+        setEmails(emails);
+        setLoadingEmails(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching emails:", error);
+        setEmails([]);
+        setLoadingEmails(false);
+      });
+  }, [currentEmail]);
+
+  useEffect(() => {
+    if (isCopied) {
+      const timer = setTimeout(() => {
+        setIsCopied(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isCopied]);
 
   const generateNewEmail = async () => {
+    setLoadingGenerate(true);
     const randomString = Math.random().toString(36).substring(2, 8);
     const newemail = await registerEmail(randomString);
-    setCurrentEmail(newemail)
+    setCurrentEmail(newemail);
+    setLoadingGenerate(false);
   };
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(currentEmail);
+    navigator.clipboard.writeText(currentEmail).then(() => {
+      setIsCopied(true);
+      console.log("Email copied to clipboard:", currentEmail);
+    }).catch((error) => {
+      console.error("Failed to copy email:", error);
+    });
   };
 
   const deleteEmail = async () => {
@@ -137,16 +120,12 @@ function HomePage() {
           <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 bg-white px-6 sm:px-10 py-4 shadow-sm">
             <div className="flex items-center gap-3 text-slate-900">
               <div className="size-7 text-blue-600">
-                <svg
-                  fill="none"
-                  viewBox="0 0 48 48"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M4 4H17.3334V17.3334H30.6666V30.6666H44V44H4V4Z"
-                    fill="currentColor"
-                  ></path>
-                </svg>
+                <Image
+                  src="/logo.svg"
+                  alt="TempMail Logo"
+                  width={48}
+                  height={48}
+                  ></Image>
               </div>
               <h1 className="text-slate-900 text-xl font-bold leading-tight tracking-tight">
                 TempMail
@@ -155,7 +134,7 @@ function HomePage() {
             <nav className="hidden sm:flex items-center gap-6">
               <a
                 className="text-slate-500 hover:text-slate-900 transition-colors"
-                href="#"
+                href="https://github.com/pranavkdileep/TempMailo"
               >
                 <Github className="h-6 w-6" />
               </a>
@@ -185,25 +164,21 @@ function HomePage() {
         <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 bg-white px-6 sm:px-10 py-4 shadow-sm">
           <div className="flex items-center gap-3 text-slate-900">
             <div className="size-7 text-blue-600">
-              <svg
-                fill="none"
-                viewBox="0 0 48 48"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M4 4H17.3334V17.3334H30.6666V30.6666H44V44H4V4Z"
-                  fill="currentColor"
-                ></path>
-              </svg>
+            <Image
+                  src="/logo.svg"
+                  alt="TempMail Logo"
+                  width={48}
+                  height={48}
+                  ></Image>
             </div>
             <h1 className="text-slate-900 text-xl font-bold leading-tight tracking-tight">
-              TempMail
+              TempMailo
             </h1>
           </div>
           <nav className="hidden sm:flex items-center gap-6">
             <a
               className="text-slate-500 hover:text-slate-900 transition-colors"
-              href="#"
+              href="https://github.com/pranavkdileep/TempMailo"
             >
               <Github className="h-6 w-6" />
             </a>
@@ -235,7 +210,11 @@ function HomePage() {
                       title="Copy email address"
                       onClick={copyToClipboard}
                     >
-                      <Copy className="h-5 w-5" />
+                      {isCopied ? (
+                        <Check className="h-5 w-5" />
+                      ) : (
+                        <Copy className="h-5 w-5" />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -244,7 +223,7 @@ function HomePage() {
                     className="flex flex-1 items-center justify-center gap-2 rounded-lg h-11 px-5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold leading-normal tracking-wide transition-colors shadow-sm"
                     onClick={generateNewEmail}
                   >
-                    <RefreshCw className="h-4 w-4" />
+                    <RefreshCw className={`h-4 w-4 ${loadingGenerate ? "animate-spin" : ""}`} />
                     <span className="truncate">Generate New</span>
                   </button>
                   <button
@@ -264,11 +243,27 @@ function HomePage() {
                 <h2 className="text-slate-800 text-xl sm:text-2xl font-bold leading-tight tracking-tight">
                   Inbox
                 </h2>
-                <button className="flex items-center justify-center rounded-md h-9 w-9 text-slate-500 hover:bg-slate-100 hover:text-blue-600 transition-colors">
-                  <RefreshCw className="h-5 w-5" />
+                <button className="flex items-center justify-center rounded-md h-9 w-9 text-slate-500 hover:bg-slate-100 hover:text-blue-600 transition-colors"
+                  onClick={() => {
+                    setLoadingEmails(true);
+                    getEmails(currentEmail)
+                      .then((emails) => {
+                        console.log("Fetched emails:", emails);
+                        setEmails(emails);
+                        setLoadingEmails(false);
+                      })
+                      .catch((error) => {
+                        console.error("Error fetching emails:", error);
+                        setEmails([]);
+                        setLoadingEmails(false);
+                      });
+                  }}
+                >
+                <RefreshCw className={`h-5 w-5 ${loadingEmails ? "animate-spin" : ""}`} />
                 </button>
               </div>
-              <div className="divide-y divide-slate-200">
+              {!loadingEmails ? <>
+                { emails.length != 0 ? (<div className="divide-y divide-slate-200">
                 {emails.map((email) => (
                   <div
                     key={email.id}
@@ -314,7 +309,16 @@ function HomePage() {
                     </div>
                   </div>
                 ))}
-              </div>
+              </div>):(
+                <div className="text-center text-slate-500">
+                  <p>No emails found.</p>
+                </div>
+              )}
+              </>:(
+                <div className="text-center text-slate-500">
+                  <p>Loading emails...</p>
+                </div>
+              )}
             </section>
           </div>
         </main>
@@ -322,7 +326,7 @@ function HomePage() {
         {/* Footer */}
         <footer className="py-8 text-center">
           <p className="text-slate-500 text-sm">
-            © 2024 TempMail. All rights reserved.
+            © 2025 TempMail. All rights reserved.
           </p>
         </footer>
       </div>

@@ -71,7 +71,7 @@ export const registerEmail = async (name: string = Math.random().toString(36).su
 }
 
 export const deletecurrentEmail = async () => {
-    try{
+    try {
         const currentemail = (await cookies()).get("currentemail");
         const currenttoken = (await cookies()).get("currenttoken");
         if (!currentemail || !currenttoken) {
@@ -80,14 +80,14 @@ export const deletecurrentEmail = async () => {
         const response = await fetch(`${baseUrl}/api/v3/email/${currentemail.value}`, {
             method: 'DELETE',
             headers: {
-              'x-rapidapi-key': x_rapidapi_key,
-              'x-rapidapi-host': x_rapidapi_host,
-              'Content-Type': 'application/json'
+                'x-rapidapi-key': x_rapidapi_key,
+                'x-rapidapi-host': x_rapidapi_host,
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 token: currenttoken.value
             })
-          }
+        }
         );
         if (!response.ok) {
             throw new Error("Failed to delete email");
@@ -96,11 +96,42 @@ export const deletecurrentEmail = async () => {
         cookieStore.delete("currentemail");
         cookieStore.delete("currenttoken");
         return true;
-    }catch (error) {
+    } catch (error) {
         const cookieStore = await cookies();
         cookieStore.delete("currentemail");
         cookieStore.delete("currenttoken");
         return true;
+    }
+}
+
+export const getEmails = async (email: string) => {
+    try {
+        const response = await fetch(`${baseUrl}/api/v3/email/${email}/messages`, {
+            method: 'GET',
+            headers: {
+                'x-rapidapi-key': x_rapidapi_key,
+                'x-rapidapi-host': x_rapidapi_host
+            }
+        });
+        let data = await response.json();
+        console.log(data);
+        if (!response.ok) {
+            throw new Error("Failed to fetch emails");
+        }
+
+
+        if (!data || data.length === 0) {
+            throw new Error("No emails found");
+        }
+        // data = data.map((email: Email) => ({
+        //     ...email,
+        //     isUnread: true,
+        // }));
+        data.sort((a: Email, b: Email) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        return data;
+    } catch (error) {
+        console.error("Error fetching emails:", error);
+        throw new Error("Failed to fetch emails");
     }
 }
 
