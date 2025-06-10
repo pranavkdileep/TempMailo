@@ -31,7 +31,7 @@ function HomePage() {
     "loading..."
   );
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
-  const [emails] = useState<Email[]>([
+  const [emails,setEmails] = useState<Email[]>([
     {
       id: "1",
       from: "support@tempmail.com",
@@ -117,6 +117,8 @@ function HomePage() {
   const deleteEmail = async () => {
     await deletecurrentEmail();
     setCurrentEmail("");
+    setSelectedEmail(null);
+    setEmails([]);
   };
 
   const handleEmailClick = (email: Email) => {
