@@ -1,5 +1,9 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+> **Disclaimer:**  
+> This project is a client-only application that uses a third-party, unofficial API: [TempMail API Free on RapidAPI](https://rapidapi.com/pranavkdileep/api/tempmail-api-free).  
+> We are not affiliated with, authorized by, or responsible for the operation, data, or security of the API or its server. Use at your own risk.
+
 ## Getting Started
 
 First, run the development server:
