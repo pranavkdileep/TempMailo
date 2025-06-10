@@ -3,6 +3,8 @@
 > We are not affiliated with, authorized by, or responsible for the operation, data, or security of the API or its server. Use at your own risk.
 
 # TempMail0 Next.js App
+![Screenshot from 2025-06-10 18-01-49](https://github.com/user-attachments/assets/29a5c727-d757-475a-bd05-a18cc39dc1c1)
+![Screenshot from 2025-06-10 18-02-01](https://github.com/user-attachments/assets/653c3091-3854-4d19-b110-3bf023739229)
 
 
 
