@@ -61,8 +61,8 @@ export const registerEmail = async (name: string = Math.random().toString(36).su
         const currentemail = data.email;
         const currenttoken = data.token;
         const cookieStore = await cookies();
-        cookieStore.set("currentemail", currentemail);
-        cookieStore.set("currenttoken", currenttoken);
+        cookieStore.set("currentemail", currentemail,{ maxAge: 60 * 60 * 24 * 30 });
+        cookieStore.set("currenttoken", currenttoken,{ maxAge: 60 * 60 * 24 * 30 });
         return currentemail;
     } catch (error) {
         console.error("Error registering email:", error);
