@@ -149,7 +149,7 @@ function HomePage() {
           {/* Footer */}
           <footer className="py-8 text-center">
             <p className="text-slate-500 text-sm">
-              © 2024 TempMailo. All rights reserved.
+              © 2025 TempMailo. All rights reserved.
             </p>
           </footer>
         </div>
@@ -326,7 +326,7 @@ function HomePage() {
         {/* Footer */}
         <footer className="py-8 text-center">
           <p className="text-slate-500 text-sm">
-            © 2025 TempMail. All rights reserved.
+            © 2025 TempMailo. All rights reserved.
           </p>
         </footer>
       </div>
