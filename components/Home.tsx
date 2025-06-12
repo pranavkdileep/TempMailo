@@ -128,7 +128,7 @@ function HomePage() {
                   ></Image>
               </div>
               <h1 className="text-slate-900 text-xl font-bold leading-tight tracking-tight">
-                TempMail
+                TempMailo
               </h1>
             </div>
             <nav className="hidden sm:flex items-center gap-6">
@@ -149,7 +149,7 @@ function HomePage() {
           {/* Footer */}
           <footer className="py-8 text-center">
             <p className="text-slate-500 text-sm">
-              © 2024 TempMail. All rights reserved.
+              © 2024 TempMailo. All rights reserved.
             </p>
           </footer>
         </div>
